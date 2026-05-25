@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>慣習 Habitus — 七大資本精力分配</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0e0c;
+  --surface: #1a1916;
+  --surface2: #232220;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.15);
+  --text: #f0ece4;
+  --text2: #9a9488;
+  --text3: #5a564f;
+  --gold: #c9a84c;
+  --gold-light: #e8cc7a;
+  --gold-dim: rgba(201,168,76,0.15);
+  --teal: #4a9e8e;
+  --teal-light: #6dc4b2;
+  --teal-dim: rgba(74,158,142,0.15);
+  --coral: #c96b4a;
+  --radius: 10px;
+  --radius-lg: 16px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Noise texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Header */
+.site-header {
+  padding: 48px 0 32px;
+  border-bottom: 0.5px solid var(--border);
+  margin-bottom: 32px;
+}
+
+.site-header .eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.site-header h1 {
+  font-family: 'Noto Serif TC', serif;
+  font-size: clamp(22px, 4vw, 34px);
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+
+.site-header .subtitle {
+  font-size: 14px;
+  color: var(--text2);
+  font-weight: 300;
+}
+
+/* Setup screen */
+#setup-screen {
+  padding: 32px 0;
+}
+
+.setup-card {
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.setup-card h2 {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.setup-card p {
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 24px;
+}
+
+.field-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--text2);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.field-group {
+  margin-bottom: 16px;
+}
+
+select, input[type="text"] {
+  width: 100%;
+  background: var(--surface2);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 14px;
+  padding: 11px 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  appearance: none;
+}
+
+select:focus, input[type="text"]:focus {
+  border-color: var(--gold);
+}
+
+select option {
+  background: var(--surface2);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0;
+  color: var(--text3);
+  font-size: 12px;
+}
+
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 0.5px;
+  background: var(--border);
+}
+
+.btn-join {
+  width: 100%;
+  padding: 13px;
+  background: var(--gold);
+  color: #0f0e0c;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 8px;
+}
+
+.btn-join:hover { background: var(--gold-light); }
+.btn-join:active { transform: scale(0.98); }
+.btn-join:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Firebase config section */
+.firebase-note {
+  background: var(--gold-dim);
+  border: 0.5px solid rgba(201,168,76,0.3);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  font-size: 12px;
+  color: var(--gold-light);
+  line-height: 1.7;
+}
+
+.firebase-note strong {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 4px;
+}
+
+.firebase-note code {
+  font-family: 'DM Mono', monospace;
+  background: rgba(201,168,76,0.15);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+/* Main app */
+#app-screen { display: none; }
+
+/* Members row */
+.members-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  align-items: center;
+}
+
+.member-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 0.5px solid;
+  transition: all 0.3s;
+}
+
+.member-pill .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.members-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-right: 4px;
+}
+
+/* Budget bar */
+.budget-strip {
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.budget-track {
+  flex: 1;
+  height: 6px;
+  background: var(--surface2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.budget-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--gold);
+  transition: width 0.3s;
+}
+
+.budget-fill.over { background: var(--coral); }
+
+.budget-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: var(--text2);
+  white-space: nowrap;
+}
+
+.budget-label span {
+  color: var(--gold);
+  font-size: 16px;
+}
+
+.budget-label span.over { color: var(--coral); }
+
+/* Capital cards */
+.capitals-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.capital-card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  transition: border-color 0.2s;
+}
+
+.capital-card:hover {
+  border-color: var(--border2);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.cap-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cap-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.cap-info h3 {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.cap-info p {
+  font-size: 11px;
+  color: var(--text3);
+  font-weight: 300;
+}
+
+.cap-aggregate {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.cap-aggregate .total-pts {
+  font-family: 'DM Mono', monospace;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.cap-aggregate .total-label {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Multi-bar */
+.multi-bar {
+  height: 8px;
+  background: var(--surface2);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.multi-bar-seg {
+  height: 100%;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* Member breakdown below bar */
+.member-breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.member-tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-family: 'DM Mono', monospace;
+  border: 0.5px solid;
+}
+
+/* My slider */
+.my-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 0.5px solid var(--border);
+}
+
+.my-slider-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+input[type="range"] {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--surface2);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 2px solid var(--bg);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.slider-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 28px;
+  text-align: right;
+  color: var(--gold);
+}
+
+/* Summary panel */
+.summary-panel {
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.summary-panel h3 {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.summary-panel h3::after {
+  content: '';
+  flex: 1;
+  height: 0.5px;
+  background: var(--border);
+}
+
+.summary-cells {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 8px;
+}
+
+.summary-cell {
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+}
+
+.summary-cell .sc-emoji {
+  font-size: 18px;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.summary-cell .sc-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+
+.summary-cell .sc-name {
+  font-size: 10px;
+  color: var(--text3);
+  line-height: 1.3;
+}
+
+/* Actions */
+.actions-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-secondary {
+  padding: 10px 18px;
+  background: transparent;
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius);
+  color: var(--text2);
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* Sync indicator */
+.sync-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--teal);
+  margin-right: 5px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.sync-strip {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  color: var(--text3);
+  margin-bottom: 20px;
+  letter-spacing: 0.06em;
+}
+
+/* Config modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.show { display: flex; }
+
+.modal-box {
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-box h2 {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.modal-box p {
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 16px;
+  line-height: 1.7;
+}
+
+.step-list {
+  counter-reset: step;
+  list-style: none;
+  margin-bottom: 20px;
+}
+
+.step-list li {
+  counter-increment: step;
+  display: flex;
+  gap: 12px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.7;
+}
+
+.step-list li::before {
+  content: counter(step);
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--gold-dim);
+  color: var(--gold);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.step-list li code {
+  font-family: 'DM Mono', monospace;
+  background: var(--surface2);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  color: var(--teal-light);
+}
+
+textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  padding: 12px;
+  resize: vertical;
+  outline: none;
+  min-height: 120px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+
+textarea:focus { border-color: var(--gold); }
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.btn-modal-cancel {
+  padding: 10px 18px;
+  background: transparent;
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius);
+  color: var(--text2);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.btn-modal-save {
+  padding: 10px 18px;
+  background: var(--gold);
+  border: none;
+  border-radius: var(--radius);
+  color: #0f0e0c;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.error-msg {
+  color: var(--coral);
+  font-size: 12px;
+  margin-top: 6px;
+  font-family: 'DM Mono', monospace;
+}
+
+/* Color palette for members */
+.palette { display: none; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header class="site-header">
+    <div class="eyebrow">慣習 Habitus · 讀書會活動</div>
+    <h1>七大資本精力分配</h1>
+    <p class="subtitle">將 100 點精力分配給七大資本，即時看見所有成員的選擇</p>
+  </header>
+
+  <!-- Setup Screen -->
+  <div id="setup-screen">
+    <div class="setup-card">
+      <h2>加入活動</h2>
+      <p>選擇你的名字，即時與其他成員同步</p>
+
+      <div class="firebase-note" id="no-config-notice" style="display:none">
+        <strong>⚙ 需要設定 Firebase</strong>
+        尚未設定即時同步資料庫，請先點下方「設定 Firebase」完成設定，只需一次。
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">選擇成員</label>
+        <select id="member-select">
+          <option value="">請選擇...</option>
+          <option value="成員 A">成員 A</option>
+          <option value="成員 B">成員 B</option>
+          <option value="成員 C">成員 C</option>
+          <option value="成員 D">成員 D</option>
+          <option value="成員 E">成員 E</option>
+        </select>
+      </div>
+
+      <div class="divider">或</div>
+
+      <div class="field-group">
+        <label class="field-label">自訂名稱</label>
+        <input type="text" id="custom-name" placeholder="輸入你的名字" maxlength="8">
+      </div>
+
+      <button class="btn-join" id="join-btn" onclick="joinActivity()">加入活動 →</button>
+      <div class="error-msg" id="join-error"></div>
+
+      <div style="display:none">
+        <button class="btn-secondary" style="width:100%; text-align:center;" onclick="showConfigModal()">⚙ 設定 Firebase 即時同步</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Screen -->
+  <div id="app-screen">
+    <div class="sync-strip">
+      <span class="sync-dot"></span>
+      即時同步中 · <span id="online-count">0</span> 人在線
+    </div>
+
+    <div class="members-row" id="members-row">
+      <span class="members-label">成員</span>
+    </div>
+
+    <div class="budget-strip">
+      <div class="budget-track">
+        <div class="budget-fill" id="budget-fill" style="width:0%"></div>
+      </div>
+      <div class="budget-label">
+        我已分配 <span id="used-pts">0</span> / 100 點
+      </div>
+    </div>
+
+    <div class="capitals-grid" id="capitals-grid"></div>
+
+    <div class="summary-panel">
+      <h3>全體分配總覽</h3>
+      <div class="summary-cells" id="summary-cells"></div>
+    </div>
+
+    <div class="actions-row">
+      <button class="btn-secondary" onclick="resetMine()">重設我的分配</button>
+      <button class="btn-secondary" onclick="shareResult()">複製我的結果</button>
+      <button class="btn-secondary" onclick="leaveAndRejoin()">切換成員</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase Config Modal -->
+<div class="modal-overlay" id="config-modal">
+  <div class="modal-box">
+    <h2>設定 Firebase 即時同步</h2>
+    <p>請依以下步驟取得 Firebase 設定：</p>
+    <ol class="step-list">
+      <li>前往 <strong>console.firebase.google.com</strong>，新增專案（免費）</li>
+      <li>進入專案後，點左側 <code>Realtime Database</code> → 建立資料庫，選擇任意地區，規則設為「測試模式」</li>
+      <li>回到專案首頁，點「新增應用程式」→ Web，複製 firebaseConfig 物件</li>
+      <li>將整個 <code>firebaseConfig = { ... }</code> 程式碼貼到下方：</li>
+    </ol>
+    <textarea id="firebase-config-input" placeholder="const firebaseConfig = {
+  apiKey: &quot;AIza...&quot;,
+  authDomain: &quot;your-app.firebaseapp.com&quot;,
+  databaseURL: &quot;https://your-app-default-rtdb.firebaseio.com&quot;,
+  projectId: &quot;your-app&quot;,
+  storageBucket: &quot;your-app.appspot.com&quot;,
+  messagingSenderId: &quot;123456&quot;,
+  appId: &quot;1:123:web:abc&quot;
+};"></textarea>
+    <div class="error-msg" id="config-error"></div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeConfigModal()">取消</button>
+      <button class="btn-modal-save" onclick="saveFirebaseConfig()">儲存並連線</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, set, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+// ─── Capital definitions ───
+const CAPITALS = [
+  { id: 'psy', emoji: '🧠', name: '心理資本', sub: '抗壓性、自信、意志力與內心的底氣' },
+  { id: 'phy', emoji: '💪', name: '身體資本', sub: '健康、體能、外在形象與精力' },
+  { id: 'eco', emoji: '💰', name: '經濟資本', sub: '金錢、資產、財務安全感' },
+  { id: 'cul', emoji: '🎨', name: '文化資本', sub: '品味、知識儲備、日常美學' },
+  { id: 'lng', emoji: '🗣', name: '語言資本', sub: '談吐、溝通藝術、說話的份量' },
+  { id: 'soc', emoji: '🤝', name: '社會資本', sub: '人際圈子、人脈的質與量' },
+  { id: 'sta', emoji: '🌟', name: '高度資本', sub: '格局、從容，以及鬆弛感' },
+];
+
+const MEMBER_COLORS = [
+  { bg: 'rgba(201,168,76,0.15)', border: 'rgba(201,168,76,0.4)', text: '#c9a84c', bar: '#c9a84c' },
+  { bg: 'rgba(74,158,142,0.15)', border: 'rgba(74,158,142,0.4)', text: '#4a9e8e', bar: '#4a9e8e' },
+  { bg: 'rgba(201,107,74,0.15)', border: 'rgba(201,107,74,0.4)', text: '#c96b4a', bar: '#c96b4a' },
+  { bg: 'rgba(120,100,200,0.15)', border: 'rgba(120,100,200,0.4)', text: '#9080d0', bar: '#9080d0' },
+  { bg: 'rgba(90,160,90,0.15)', border: 'rgba(90,160,90,0.4)', text: '#5aa05a', bar: '#5aa05a' },
+];
+
+const ICON_COLORS = ['#c9a84c22','#4a9e8e22','#c96b4a22','#9080d022','#5aa05a22','#d4887022','#6688cc22'];
+
+// ─── State ───
+let db = null;
+let myName = '';
+let myAlloc = {};
+let allData = {};
+let memberColorMap = {};
+let memberOrder = [];
+let unsubscribe = null;
+
+CAPITALS.forEach(c => myAlloc[c.id] = 0);
+
+// ─── Firebase init ───
+function initFirebase(config) {
+  try {
+    const app = initializeApp(config, 'habitus-' + Date.now());
+    db = getDatabase(app);
+    return true;
+  } catch(e) {
+    console.error(e);
+    return false;
+  }
+}
+
+// ─── Firebase config (已內嵌) ───
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAXA4NW_NXwq1_HFpBIEndC4YP7nBMg3wk",
+  authDomain: "habitus-71150.firebaseapp.com",
+  databaseURL: "https://habitus-71150-default-rtdb.firebaseio.com",
+  projectId: "habitus-71150",
+  storageBucket: "habitus-71150.firebasestorage.app",
+  messagingSenderId: "1082789076864",
+  appId: "1:1082789076864:web:ebbd561efbc57e13292b65"
+};
+
+// ─── Load config & auto-rejoin ───
+window.addEventListener('DOMContentLoaded', () => {
+  if (initFirebase(FIREBASE_CONFIG)) {
+    document.getElementById('no-config-notice').style.display = 'none';
+  }
+  buildSummary();
+
+  // 自動恢復上次的名字與分配
+  const savedName = localStorage.getItem('habitus-my-name');
+  const savedAlloc = localStorage.getItem('habitus-my-alloc');
+  if (savedName && db) {
+    myName = savedName;
+    if (savedAlloc) {
+      try { Object.assign(myAlloc, JSON.parse(savedAlloc)); } catch(e) {}
+    }
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+    buildGrid();
+    CAPITALS.forEach(c => {
+      const sl = document.getElementById('slider-' + c.id);
+      const sv = document.getElementById('sval-' + c.id);
+      if (sl) sl.value = myAlloc[c.id] || 0;
+      if (sv) sv.textContent = myAlloc[c.id] || 0;
+    });
+    buildSummary();
+    subscribeFirebase();
+  }
+});
+
+// ─── Config modal ───
+window.showConfigModal = () => {
+  document.getElementById('config-modal').classList.add('show');
+};
+
+window.closeConfigModal = () => {
+  document.getElementById('config-modal').classList.remove('show');
+};
+
+window.saveFirebaseConfig = () => {
+  const raw = document.getElementById('firebase-config-input').value.trim();
+  const errEl = document.getElementById('config-error');
+  errEl.textContent = '';
+  try {
+    // Extract the object from the text
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('找不到設定物件，請貼上完整的 firebaseConfig');
+    const obj = new Function('return (' + match[0] + ')')();
+    if (!obj.databaseURL) throw new Error('缺少 databaseURL，請確認你已建立 Realtime Database');
+    if (initFirebase(obj)) {
+      localStorage.setItem('habitus-firebase-config', JSON.stringify(obj));
+      document.getElementById('no-config-notice').style.display = 'none';
+      closeConfigModal();
+    } else {
+      throw new Error('Firebase 初始化失敗，請確認設定是否正確');
+    }
+  } catch(e) {
+    errEl.textContent = '錯誤：' + e.message;
+  }
+};
+
+// ─── Join ───
+window.joinActivity = () => {
+  const sel = document.getElementById('member-select').value;
+  const custom = document.getElementById('custom-name').value.trim();
+  const name = custom || sel;
+  const errEl = document.getElementById('join-error');
+  errEl.textContent = '';
+
+  if (!name) { errEl.textContent = '請選擇或輸入名字'; return; }
+  if (!db) { errEl.textContent = '請先完成 Firebase 設定'; return; }
+
+  myName = name;
+  CAPITALS.forEach(c => myAlloc[c.id] = 0);
+  localStorage.setItem('habitus-my-name', myName);
+  localStorage.setItem('habitus-my-alloc', JSON.stringify(myAlloc));
+
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+
+  buildGrid();
+  buildSummary();
+  subscribeFirebase();
+};
+
+// ─── Firebase sync ───
+function subscribeFirebase() {
+  const dbRef = ref(db, 'habitus/alloc');
+  unsubscribe = onValue(dbRef, snapshot => {
+    allData = snapshot.val() || {};
+    // Assign colors to new members
+    Object.keys(allData).forEach(m => {
+      if (!memberColorMap[m]) {
+        const idx = memberOrder.length % MEMBER_COLORS.length;
+        memberColorMap[m] = MEMBER_COLORS[idx];
+        memberOrder.push(m);
+      }
+    });
+    if (!memberColorMap[myName]) {
+      const idx = memberOrder.length % MEMBER_COLORS.length;
+      memberColorMap[myName] = MEMBER_COLORS[idx];
+      memberOrder.push(myName);
+    }
+    renderMembers();
+    renderBars();
+    renderSummary();
+  });
+}
+
+function pushMyAlloc() {
+  if (!db || !myName) return;
+  set(ref(db, 'habitus/alloc/' + myName), myAlloc);
+}
+
+// ─── Build grid (once) ───
+function buildGrid() {
+  const grid = document.getElementById('capitals-grid');
+  grid.innerHTML = '';
+  CAPITALS.forEach((c, i) => {
+    const card = document.createElement('div');
+    card.className = 'capital-card';
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="cap-meta">
+          <div class="cap-icon" style="background:${ICON_COLORS[i]}">${c.emoji}</div>
+          <div class="cap-info">
+            <h3>${c.name}</h3>
+            <p>${c.sub}</p>
+          </div>
+        </div>
+        <div class="cap-aggregate">
+          <div class="total-pts" id="total-${c.id}" style="color:var(--gold)">0</div>
+          <div class="total-label">全體合計</div>
+        </div>
+      </div>
+      <div class="multi-bar" id="bar-${c.id}"></div>
+      <div class="member-breakdown" id="breakdown-${c.id}"></div>
+      <div class="my-slider-row">
+        <span class="my-slider-label">我</span>
+        <input type="range" min="0" max="100" step="10" value="0" id="slider-${c.id}"
+          oninput="onSlide('${c.id}', this.value)">
+        <span class="slider-val" id="sval-${c.id}">0</span>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function buildSummary() {
+  const sg = document.getElementById('summary-cells');
+  sg.innerHTML = '';
+  CAPITALS.forEach((c, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'summary-cell';
+    cell.innerHTML = `
+      <span class="sc-emoji">${c.emoji}</span>
+      <div class="sc-num" id="snum-${c.id}" style="color:${MEMBER_COLORS[i % MEMBER_COLORS.length].bar}">0</div>
+      <div class="sc-name">${c.name}</div>
+    `;
+    sg.appendChild(cell);
+  });
+}
+
+// ─── Render ───
+function renderMembers() {
+  const row = document.getElementById('members-row');
+  row.innerHTML = '<span class="members-label">成員</span>';
+  const allMembers = Array.from(new Set([...memberOrder, ...Object.keys(allData)]));
+  document.getElementById('online-count').textContent = allMembers.length;
+  allMembers.forEach(m => {
+    const color = memberColorMap[m] || MEMBER_COLORS[0];
+    const pill = document.createElement('div');
+    pill.className = 'member-pill';
+    pill.style.background = color.bg;
+    pill.style.borderColor = color.border;
+    pill.style.color = color.text;
+    pill.innerHTML = `<span class="dot" style="background:${color.bar}"></span>${m === myName ? '👤 ' : ''}${m}`;
+    row.appendChild(pill);
+  });
+}
+
+function renderBars() {
+  let used = 0;
+  CAPITALS.forEach(c => { used += myAlloc[c.id] || 0; });
+  const pct = Math.min(used, 100);
+  const fill = document.getElementById('budget-fill');
+  fill.style.width = pct + '%';
+  fill.className = 'budget-fill' + (used > 100 ? ' over' : '');
+  const usedEl = document.getElementById('used-pts');
+  usedEl.textContent = used;
+  usedEl.className = used > 100 ? 'over' : '';
+
+  const allMembers = Object.keys(allData);
+
+  CAPITALS.forEach(c => {
+    const barEl = document.getElementById('bar-' + c.id);
+    const bdEl = document.getElementById('breakdown-' + c.id);
+    barEl.innerHTML = '';
+    bdEl.innerHTML = '';
+    let total = 0;
+
+    allMembers.forEach(m => {
+      const pts = (allData[m] && allData[m][c.id]) || 0;
+      total += pts;
+      const color = memberColorMap[m] || MEMBER_COLORS[0];
+      if (pts > 0) {
+        const seg = document.createElement('div');
+        seg.className = 'multi-bar-seg';
+        seg.style.width = pts + '%';
+        seg.style.background = color.bar;
+        seg.title = m + ': ' + pts + '點';
+        barEl.appendChild(seg);
+
+        const tag = document.createElement('div');
+        tag.className = 'member-tag';
+        tag.style.background = color.bg;
+        tag.style.borderColor = color.border;
+        tag.style.color = color.text;
+        tag.textContent = m + ' · ' + pts;
+        bdEl.appendChild(tag);
+      }
+    });
+
+    document.getElementById('total-' + c.id).textContent = total;
+  });
+}
+
+function renderSummary() {
+  const allMembers = Object.keys(allData);
+  CAPITALS.forEach(c => {
+    let total = 0;
+    allMembers.forEach(m => { total += (allData[m] && allData[m][c.id]) || 0; });
+    document.getElementById('snum-' + c.id).textContent = total;
+  });
+}
+
+// ─── Slider interaction ───
+window.onSlide = (id, val) => {
+  myAlloc[id] = parseInt(val);
+  document.getElementById('sval-' + id).textContent = val;
+  localStorage.setItem('habitus-my-alloc', JSON.stringify(myAlloc));
+  // Optimistic local update
+  if (!allData[myName]) allData[myName] = {};
+  allData[myName][id] = parseInt(val);
+  renderBars();
+  renderSummary();
+  debounce(pushMyAlloc, 300)();
+};
+
+const _timers = {};
+function debounce(fn, ms) {
+  return function() {
+    clearTimeout(_timers[fn]);
+    _timers[fn] = setTimeout(fn, ms);
+  };
+}
+
+// ─── Actions ───
+window.resetMine = () => {
+  CAPITALS.forEach(c => {
+    myAlloc[c.id] = 0;
+    const sl = document.getElementById('slider-' + c.id);
+    const sv = document.getElementById('sval-' + c.id);
+    if (sl) sl.value = 0;
+    if (sv) sv.textContent = '0';
+  });
+  if (allData[myName]) allData[myName] = {};
+  renderBars();
+  renderSummary();
+  pushMyAlloc();
+};
+
+window.shareResult = () => {
+  let used = 0;
+  CAPITALS.forEach(c => { used += myAlloc[c.id] || 0; });
+  let text = `${myName} 的七大資本精力分配（共${used}點）\n`;
+  text += '─'.repeat(24) + '\n';
+  CAPITALS.forEach(c => {
+    const pts = myAlloc[c.id] || 0;
+    const bar = '█'.repeat(pts / 10) + '░'.repeat(10 - pts / 10);
+    text += `${c.emoji} ${c.name.padEnd(4)}　${bar}　${pts}點\n`;
+  });
+  navigator.clipboard.writeText(text).then(() => alert('已複製到剪貼簿！'));
+};
+
+window.leaveAndRejoin = () => {
+  if (unsubscribe) unsubscribe();
+  // Remove from DB
+  if (db && myName) {
+    remove(ref(db, 'habitus/alloc/' + myName));
+  }
+  localStorage.removeItem('habitus-my-name');
+  localStorage.removeItem('habitus-my-alloc');
+  myName = '';
+  allData = {};
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('setup-screen').style.display = 'block';
+  document.getElementById('member-select').value = '';
+  document.getElementById('custom-name').value = '';
+};
+</script>
+</body>
+</html>
