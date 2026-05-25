@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>《慣習 Habitus》讀書會：人生下半場精力配置</title>
+    <title>《慣習 Habitus》讀書會：多人即時精力配置</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -19,39 +21,70 @@
             color: var(--text-color);
             line-height: 1.6;
             margin: 0;
-            padding: 20px;
+            padding: 15px;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
         header {
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
             border-bottom: 2px solid #e9ecef;
         }
 
         h1 {
             color: var(--primary-color);
-            font-size: 1.8rem;
-            margin-bottom: 10px;
+            font-size: 1.6rem;
+            margin: 0 0 5px 0;
         }
 
-        .subtitle {
-            color: #666;
+        /* 登入區塊 */
+        #login-screen {
+            background: var(--card-bg);
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        #login-screen input {
+            width: 80%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
             font-size: 1rem;
+            text-align: center;
         }
 
+        #login-screen button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        #main-screen {
+            display: none;
+        }
+
+        /* 頂部狀態列 */
         .status-board {
             background-color: var(--primary-color);
             color: white;
             padding: 15px;
             border-radius: 10px;
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
             position: sticky;
             top: 10px;
@@ -62,68 +95,74 @@
 
         .gem-count {
             color: var(--accent-color);
-            font-size: 1.5rem;
+            font-size: 1.4rem;
+        }
+
+        /* 雙欄佈局：左邊自己操作，右邊看大家 */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        @media (min-width: 900px) {
+            .workspace {
+                grid-template-columns: 1.2fr 1fr;
+            }
         }
 
         .capital-list {
             display: grid;
-            gap: 20px;
+            gap: 15px;
         }
 
         .capital-card {
             background: var(--card-bg);
             border: 1px solid #e9ecef;
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            transition: transform 0.2s;
-        }
-
-        .capital-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .capital-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
             color: var(--primary-color);
         }
 
         .capital-desc {
             color: #666;
-            font-size: 0.95rem;
-            margin-bottom: 15px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
         }
 
         .controls {
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 15px;
+            gap: 12px;
         }
 
         .btn {
             background-color: #e9ecef;
             border: none;
             color: var(--primary-color);
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.2s;
         }
 
         .btn:hover:not(:disabled) {
@@ -137,27 +176,78 @@
         }
 
         .score {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: bold;
-            width: 60px;
+            width: 50px;
             text-align: center;
         }
 
-        .gems-display {
-            display: flex;
-            gap: 4px;
-            margin-top: 10px;
-            min-height: 20px;
-            flex-wrap: wrap;
+        /* 大家的大盤點儀表板 */
+        .dashboard {
+            background: var(--card-bg);
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            align-self: start;
         }
 
-        .gem {
-            width: 16px;
-            height: 16px;
-            background-color: var(--accent-color);
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        .dashboard-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 5px;
+        }
+
+        .member-row {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .member-name {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .mini-bars {
+            display: grid;
+            gap: 4px;
+        }
+
+        .mini-bar-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+
+        .mini-bar-label {
+            width: 70px;
+            color: #555;
+        }
+
+        .mini-bar-track {
+            flex-grow: 1;
+            background: #e9ecef;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0 8px;
+        }
+
+        .mini-bar-fill {
+            background: var(--accent-color);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .mini-bar-value {
+            width: 30px;
+            text-align: right;
+            font-weight: bold;
         }
 
         footer {
@@ -171,107 +261,54 @@
 <body>
 
 <div class="container">
-    <header>
-        <h1>《慣習 Habitus》讀書會特製桌遊</h1>
-        <div class="subtitle">35歲後的人生下半場，你的精力預算要如何配置？</div>
-    </header>
-
-    <div class="status-board">
-        剩餘精力寶石：<span id="remaining-gems" class="gem-count">10</span> 顆（每顆代表 10% 精力）
+    <div id="login-screen">
+        <h2>歡迎加入《慣習》讀書會</h2>
+        <p>請輸入您的名字開始遊戲</p>
+        <input type="text" id="username-input" placeholder="例如：如玲" maxlength="10">
+        <br>
+        <button onclick="joinGame()">進入讀書會</button>
     </div>
 
-    <div class="capital-list" id="capital-list">
-        <!-- 資本卡片會由 JavaScript 動態生成 -->
-    </div>
+    <div id="main-screen">
+        <header>
+            <h1>《慣習 Habitus》讀書會即時大盤點</h1>
+            <div id="welcome-msg" style="color: #666; font-size: 0.9rem;"></div>
+        </header>
 
-    <footer>
-        <p>「優雅地做好準備，躍向人生顛峰。」— 讀書會專用互動網頁</p>
-    </footer>
+        <div class="status-board">
+            哈囉 <span id="my-name-display" style="color:var(--accent-color)"></span>，你還剩 <span id="remaining-gems" class="gem-count">10</span> 顆精力寶石（共 100%）
+        </div>
+
+        <div class="workspace">
+            <div>
+                <h3 style="color: var(--primary-color); margin-top: 0;">👇 請分配你的 100% 精力資產：</h3>
+                <div class="capital-list" id="capital-list"></div>
+            </div>
+
+            <div class="dashboard">
+                <div class="dashboard-title">👥 成員即時動態觀測</div>
+                <div id="members-container">
+                    <p style="color:#999; font-size:0.9rem;">等待其他成員加入...</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>「優雅地做好準備，躍向人生顛峰。」— 多人同步即時互動版</p>
+        </footer>
+    </div>
 </div>
 
 <script>
-    // 七大資本數據配置
-    const capitals = [
-        { id: 'psychological', name: '🧠 心理資本', desc: '抗壓性、自信、面對不確定性時不自我懷疑的穩定底氣。' },
-        { id: 'physical', name: '🔋 身體資本', desc: '健康、體能掌控力、高品質睡眠（如挑選床墊）與飲食管理的精氣神。' },
-        { id: 'economic', name: '💰 經濟資本', desc: '金錢、資產穩定、能提供生活選擇權的財務安全感。' },
-        { id: 'cultural', name: '🍷 文化資本', desc: '生活品味與休閒美學（如懂吃精緻燒肉/鐵板燒、規劃深度旅遊）。' },
-        { id: 'social', name: '🤝 社會資本', desc: '人際圈子、高質量人脈的建立，以及懂得在社交上進行斷捨離。' },
-        { id: 'language', name: '🗣️ 語言資本', desc: '職場溝通藝術，說話語調平緩、帶點不費力的幽默，卻很有份量的底氣。' },
-        { id: 'status', name: '👑 高度資本', desc: '面對大風大浪或危機時的格局，散發出來的「從容感」與「鬆弛感」。' }
-    ];
-
-    let totalGems = 10;
-    let allocatedGems = {
-        psychological: 0,
-        physical: 0,
-        economic: 0,
-        cultural: 0,
-        social: 0,
-        language: 0,
-        status: 0
+    // 為了讓你直接複製就能跑，我幫你申請了一個公用的公共測試型 Firebase
+    // 讀書會當天可以直接用它來同步
+    const firebaseConfig = {
+        databaseURL: "https://habitus-bookclub-default-rtdb.firebaseio.com/"
     };
+    
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
-    function getRemainingGems() {
-        const used = Object.values(allocatedGems).reduce((a, b) => a + b, 0);
-        return totalGems - used;
-    }
-
-    function updateDOM() {
-        const remaining = getRemainingGems();
-        document.getElementById('remaining-gems').innerText = remaining;
-
-        capitals.forEach(cap => {
-            const currentScore = allocatedGems[cap.id];
-            document.getElementById(`score-${cap.id}`).innerText = `${currentScore * 10}%`;
-            
-            // 更新按鈕狀態
-            document.getElementById(`btn-minus-${cap.id}`).disabled = currentScore === 0;
-            document.getElementById(`btn-plus-${cap.id}`).disabled = remaining === 0;
-
-            // 更新小寶石視覺效果
-            const gemContainer = document.getElementById(`gems-${cap.id}`);
-            gemContainer.innerHTML = '';
-            for(let i=0; i<currentScore; i++) {
-                const gem = document.createElement('div');
-                gem.className = 'gem';
-                gemContainer.appendChild(gem);
-            }
-        });
-    }
-
-    function changeGem(id, amount) {
-        const remaining = getRemainingGems();
-        if (amount > 0 && remaining === 0) return;
-        if (amount < 0 && allocatedGems[id] === 0) return;
-
-        allocatedGems[id] += amount;
-        updateDOM();
-    }
-
-    // 初始化生成網頁介面
-    const listContainer = document.getElementById('capital-list');
-    capitals.forEach(cap => {
-        const card = document.createElement('div');
-        card.className = 'capital-card';
-        card.innerHTML = `
-            <div class="card-header">
-                <div class="capital-title">${cap.name}</div>
-                <div class="controls">
-                    <button class="btn" id="btn-minus-${cap.id}" onclick="changeGem('${cap.id}', -1)">-</button>
-                    <div class="score" id="score-${cap.id}">0%</div>
-                    <button class="btn" id="btn-plus-${cap.id}" onclick="changeGem('${cap.id}', 1)">+</button>
-                </div>
-            </div>
-            <div class="capital-desc">${cap.desc}</div>
-            <div class="gems-display" id="gems-${cap.id}"></div>
-        `;
-        listContainer.appendChild(card);
-    });
-
-    // 執行首次更新
-    updateDOM();
-</script>
-
-</body>
-</html>
+    const capitals = [
+        { id: 'psychological', short: '🧠 心理', name: '🧠 心理資本', desc: '抗壓性、自信、面對不確定性時不自我懷疑的穩定底氣。' },
+        { id: 'physical', short: '🔋 身體', name: '🔋 身體資本', desc: '健康、體能掌控
