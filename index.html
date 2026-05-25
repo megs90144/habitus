@@ -311,4 +311,127 @@
 
     const capitals = [
         { id: 'psychological', short: '🧠 心理', name: '🧠 心理資本', desc: '抗壓性、自信、面對不確定性時不自我懷疑的穩定底氣。' },
-        { id: 'physical', short: '🔋 身體', name: '🔋 身體資本', desc: '健康、體能掌控
+        { id: 'physical', short: '🔋 身體', name: '🔋 身體資本', desc: '健康、體能掌控力、高品質睡眠與飲食管理的精氣神。' },
+        { id: 'economic', short: '💰 經濟', name: '💰 經濟資本', desc: '金錢、資產穩定、能提供生活選擇權的財務安全感。' },
+        { id: 'cultural', short: '🍷 文化', name: '🍷 文化資本', desc: '生活品味與休閒美學（如懂吃精緻餐點、規劃深度旅遊）。' },
+        { id: 'social', short: '🤝 社會', name: '🤝 社會資本', desc: '人際圈子、高質量人脈的建立，以及懂得進行斷捨離。' },
+        { id: 'language', short: '🗣️ 語言', name: '🗣️ 語言資本', desc: '說話語調平緩、帶點不費力的幽默，卻很有份量的說話藝術。' },
+        { id: 'status', short: '👑 高度', name: '👑 高度資本', desc: '面對大風大浪或危機時的格局，散發出來的從容與鬆弛感。' }
+    ];
+
+    let currentUserName = "";
+    let totalGems = 10;
+    let myAllocatedGems = { psychological: 0, physical: 0, economic: 0, cultural: 0, social: 0, language: 0, status: 0 };
+
+    // 登入進入遊戲
+    function joinGame() {
+        const nameInput = document.getElementById('username-input').value.trim();
+        if(!nameInput) {
+            alert('請輸入名字喔！');
+            return;
+        }
+        currentUserName = nameInput;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-screen').style.display = 'block';
+        document.getElementById('my-name-display').innerText = currentUserName;
+
+        // 初始化自己在資料庫的數據
+        database.ref('users/' + currentUserName).set(myAllocatedGems);
+
+        // 開始監聽整個資料庫，任何人改動都會觸發這個即時同步
+        startRealtimeSync();
+    }
+
+    // 初始化左側個人操作介面
+    const listContainer = document.getElementById('capital-list');
+    capitals.forEach(cap => {
+        const card = document.createElement('div');
+        card.className = 'capital-card';
+        card.innerHTML = `
+            <div class="card-header">
+                <div class="capital-title">${cap.name}</div>
+                <div class="controls">
+                    <button class="btn" id="btn-minus-${cap.id}" onclick="changeGem('${cap.id}', -1)" disabled>-</button>
+                    <div class="score" id="index-score-${cap.id}">0%</div>
+                    <button class="btn" id="btn-plus-${cap.id}" onclick="changeGem('${cap.id}', 1)">+</button>
+                </div>
+            </div>
+            <div class="capital-desc">${cap.desc}</div>
+        `;
+        listContainer.appendChild(card);
+    });
+
+    function getRemainingGems() {
+        const used = Object.values(myAllocatedGems).reduce((a, b) => a + b, 0);
+        return totalGems - used;
+    }
+
+    // 點擊加減按鈕
+    function changeGem(id, amount) {
+        const remaining = getRemainingGems();
+        if (amount > 0 && remaining === 0) return;
+        if (amount < 0 && myAllocatedGems[id] === 0) return;
+
+        myAllocatedGems[id] += amount;
+        
+        // 更新本地按鈕狀態
+        updateLocalUI();
+
+        // 核心：把新數據推送到雲端資料庫，這會引發所有人畫面同步更新
+        database.ref('users/' + currentUserName).set(myAllocatedGems);
+    }
+
+    function updateLocalUI() {
+        const remaining = getRemainingGems();
+        document.getElementById('remaining-gems').innerText = remaining;
+
+        capitals.forEach(cap => {
+            const currentScore = myAllocatedGems[cap.id];
+            document.getElementById(`index-score-${cap.id}`).innerText = `${currentScore * 10}%`;
+            document.getElementById(`btn-minus-${cap.id}`).disabled = currentScore === 0;
+            document.getElementById(`btn-plus-${cap.id}`).disabled = remaining === 0;
+        });
+    }
+
+    // 多人即時同步核心：接聽雲端資料庫狀態
+    function startRealtimeSync() {
+        database.ref('users').on('value', (snapshot) => {
+            const allUsersData = snapshot.val();
+            if (!allUsersData) return;
+
+            const container = document.getElementById('members-container');
+            container.innerHTML = ''; // 清空舊畫面
+
+            // 遍歷所有在線上的成員數據，渲染出即時條狀圖
+            Object.keys(allUsersData).forEach(name => {
+                const userScores = allUsersData[name];
+                const isMe = name === currentUserName ? " (你)" : "";
+                
+                let memberRowHtml = `
+                    <div class="member-row">
+                        <div class="member-name">👤 ${name}${isMe}</div>
+                        <div class="mini-bars">
+                `;
+
+                capitals.forEach(cap => {
+                    const scoreVal = (userScores[cap.id] || 0) * 10;
+                    memberRowHtml += `
+                        <div class="mini-bar-item">
+                            <div class="mini-bar-label">${cap.short}</div>
+                            <div class="mini-bar-track">
+                                <div class="mini-bar-fill" style="width: ${scoreVal}%"></div>
+                            </div>
+                            <div class="mini-bar-value">${scoreVal}%</div>
+                        </div>
+                    `;
+                });
+
+                memberRowHtml += `</div></div>`;
+                container.innerHTML += memberRowHtml;
+            });
+        });
+    }
+</script>
+
+</body>
+</html>
